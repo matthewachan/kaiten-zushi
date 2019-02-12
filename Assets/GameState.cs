@@ -24,6 +24,7 @@ public class GameState : MonoBehaviour
             Ray inputRay = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit info;
             if (Physics.Raycast(inputRay, out info)) {
+                Debug.Log(info.collider.gameObject.name);
                 selectedObj = info.collider.gameObject;
             }
 

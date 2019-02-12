@@ -27,7 +27,7 @@ public class TrayControl : MonoBehaviour
 
     private void OnTriggerStay(Collider other)
     {
-        Vector3 dir = this.transform.TransformDirection(0, 0, 1);
+        Vector3 dir = this.transform.TransformDirection(0, 0, -1);
         dir *= 0.5f;
         if (other.name == "Sushi Plate") {
             Vector3 pos = other.transform.position;
