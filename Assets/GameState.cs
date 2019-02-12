@@ -4,10 +4,16 @@ using UnityEngine;
 
 public class GameState : MonoBehaviour
 {
+    public GameObject selectedObj;
+    public bool paused;
+
+    public string difficulty;
+
     // Start is called before the first frame update
     void Start()
     {
-        
+        paused = false;
+        difficulty = "easy";
     }
 
     // Update is called once per frame
@@ -16,13 +22,12 @@ public class GameState : MonoBehaviour
         
         if (Input.GetMouseButtonDown(0)) {
             Ray inputRay = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit[] info = Physics.RaycastAll(inputRay);
-            Debug.Log(info[1].collider.gameObject.name);
-            //foreach (RaycastHit hit in info) {
-            //    Debug.Log(hit.collider.gameObject.name);
-            //}
+            RaycastHit info;
+            if (Physics.Raycast(inputRay, out info)) {
+                selectedObj = info.collider.gameObject;
+            }
+
         }
         
-
     }
 }
