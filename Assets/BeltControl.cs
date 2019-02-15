@@ -1,69 +1,58 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class BeltControl : MonoBehaviour
 {
-    public float speed = 10;
-    public GameObject menu;
-    private GameObject ui;
-
-
-    private bool selected;
+    GameState game_state;
+    KaitenController ctrl;
+    private Material mat;
 
     // Start is called before the first frame update
     void Start()
     {
-       
-        selected = false;
+        ctrl = GameObject.Find("Kaiten Zushi").GetComponent<KaitenController>();
+        game_state = GameObject.Find("GameState").GetComponent<GameState>();
+        mat = ctrl.belt_mat;
     }
 
-    void CloseWindow()
-    {
-        Destroy(ui);
-        selected = false;
-    }
     // Update is called once per frame
     void Update()
     {
-        GameState game_state = GameObject.Find("GameState").GetComponent<GameState>();
-
-
-
-        if (selected) {
-            GameObject.Find("Exit").GetComponent<UnityEngine.UI.Button>().onClick.AddListener(CloseWindow);
+        if (Input.GetMouseButtonDown(0))
+        {
+            /* Return if the mouse is over a UI object */
+            if (UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
+                return;
             
+            Ray inputRay = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit info;
+            if (Physics.Raycast(inputRay, out info))
+            {
+                if (info.collider.gameObject == this.gameObject)
+                {
+                    game_state.canvas.SetActive(true);
+                    GameObject.Find("Panel").transform.position = Input.mousePosition;
+                    mat.color = Color.green;
+
+                    ctrl.prevSpeed = ctrl.beltSpeed;
+                    ctrl.beltSpeed = 0;
+
+                }
+            }
         }
 
-
-        if (!selected && game_state.selectedObj == this.gameObject) {
-            selected = true;
-            
-            GameObject canvas = GameObject.Find("Canvas");
-            canvas.SetActive(true);
-            ui = Instantiate(menu, canvas.transform);
-            ui.GetComponent<RectTransform>().anchoredPosition = this.transform.position;
-        }
-
-
-        if (game_state.selectedObj != this.gameObject) {
-            selected = false;
-        }
-
-
-        //if (!selected) {
-        //    Destroy(ui);
-        //}
     }
 
 
     private void OnCollisionStay(Collision collision)
     {
         GameObject other = collision.gameObject;
-        Vector3 dir = this.transform.TransformDirection(-1, 0, 0);
-        dir *= speed;
+        Vector3 target = this.transform.TransformPoint(Vector3.left * 2.5f);
+        int speed = ctrl.beltSpeed;
         if (other.name == "Sushi Plate") {
-            other.GetComponent<Rigidbody>().AddRelativeForce(dir);
+            other.transform.position = Vector3.MoveTowards(other.transform.position, target, speed * Time.deltaTime);
         }
     }
 }
