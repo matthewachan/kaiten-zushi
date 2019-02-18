@@ -51,7 +51,7 @@ public class BeltControl : MonoBehaviour
         GameObject other = collision.gameObject;
         Vector3 target = this.transform.TransformPoint(Vector3.left * 2.5f);
         int speed = ctrl.beltSpeed;
-        if (other.name == "Sushi Plate") {
+        if (other.tag == "Plate") {
             other.transform.position = Vector3.MoveTowards(other.transform.position, target, speed * Time.deltaTime);
         }
     }

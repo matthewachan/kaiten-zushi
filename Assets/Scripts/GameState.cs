@@ -32,28 +32,28 @@ public class GameState : MonoBehaviour
         canvas.SetActive(false);
         ctrl.belt_mat.color = Color.white;
         ctrl.beltSpeed = ctrl.prevSpeed;
-
+        WakeUpPlates();
     }
 
     void ReduceSpeed()
     {
         KaitenController ctrl = GameObject.Find("Kaiten Zushi").GetComponent<KaitenController>();
-        if (ctrl.beltSpeed > 0)
-            ctrl.beltSpeed--;
+        if (ctrl.prevSpeed > 0)
+            ctrl.prevSpeed--;
 
+    }
+
+    void WakeUpPlates()
+    {
+        foreach (GameObject plate in GameObject.FindGameObjectsWithTag("Plate"))
+        {
+            plate.GetComponent<Rigidbody>().WakeUp();
+        }
     }
 
     void IncreaseSpeed()
     {
-
-        if (GameObject.Find("Kaiten Zushi").GetComponent<KaitenController>().beltSpeed++ == 0)
-        {
-            Debug.Log("do something here");
-            foreach (GameObject plate in GameObject.FindGameObjectsWithTag("Plate"))
-            {
-                plate.GetComponent<Rigidbody>().WakeUp();
-            }
-        }
+        GameObject.Find("Kaiten Zushi").GetComponent<KaitenController>().prevSpeed++;
 
     }
 
