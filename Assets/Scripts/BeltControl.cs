@@ -17,6 +17,7 @@ public class BeltControl : MonoBehaviour
         mat = ctrl.belt_mat;
     }
 
+ 
     // Update is called once per frame
     void Update()
     {

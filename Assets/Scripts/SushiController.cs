@@ -17,10 +17,15 @@ public class SushiController : MonoBehaviour
     float s1;
     float s2;
 
+    private float spawnTime;
+    bool destroyed = false;
+
 
     // Start is called before the first frame update
     void Start()
     {
+        spawnTime = Time.time;
+        Debug.Log("Spawning in at " + spawnTime);
         dragging = false;
         default_color = GetComponent<Renderer>().material.color;  
 
@@ -34,12 +39,14 @@ public class SushiController : MonoBehaviour
             inner_marker = new GameObject();
             inner_marker.transform.SetParent(transform);
             inner_marker.transform.localScale = Vector3.zero;
+            inner_marker.transform.position = transform.position;
             inner_marker.transform.position += new Vector3(r1, 2, 0);
 
 
             outer_marker = new GameObject();
             outer_marker.transform.SetParent(transform);
             outer_marker.transform.localScale = Vector3.zero;
+            outer_marker.transform.position = transform.position;
             outer_marker.transform.position += new Vector3(r2, 2, 0);
 
 
@@ -55,6 +62,17 @@ public class SushiController : MonoBehaviour
             outer_sauce.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
             outer_sauce.GetComponent<Renderer>().material.color = Color.red;
 
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    { 
+        if (other.name == "Spawn Point" && (Time.time - spawnTime) > 5 && !destroyed)
+        {
+            GameObject.Find("GameState").GetComponent<GameState>().gameObjects.Dequeue();
+            destroyed = true;
+            Debug.Log("Destroy plate");
+            Destroy(this.gameObject);
         }
     }
 

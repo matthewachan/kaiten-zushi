@@ -9,11 +9,15 @@ public class GameState : MonoBehaviour
     public GameObject canvas;
     //public bool paused;
 
+
+    public Queue<GameObject> gameObjects;
     public string difficulty;
 
     // Start is called before the first frame update
     void Start()
     {
+        gameObjects = new Queue<GameObject>();
+
         canvas = GameObject.Find("Canvas");
         GameObject.Find("Plus").GetComponent<Button>().onClick.AddListener(IncreaseSpeed);
         GameObject.Find("Minus").GetComponent<Button>().onClick.AddListener(ReduceSpeed);
