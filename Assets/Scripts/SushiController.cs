@@ -29,7 +29,7 @@ public class SushiController : MonoBehaviour
         spawnTime = Time.time;
         //Debug.Log("Spawning in at " + spawnTime);
         dragging = false;
-        default_color = GetComponent<Renderer>().material.color;  
+        default_color = GetComponentsInChildren<Renderer>()[0].material.color;  
 
         if (isSpecial)
         {
@@ -74,7 +74,7 @@ public class SushiController : MonoBehaviour
             GameState state = GameObject.Find("GameState").GetComponent<GameState>();
             if ((Time.time - spawnTime) > 0.5f && !destroyed)
             {
-                state.gameObjects.Dequeue();
+                state.gameObjects.Remove(state.gameObjects[0]);
                 destroyed = true;
                 Destroy(this.gameObject);
             }
@@ -93,6 +93,10 @@ public class SushiController : MonoBehaviour
             if (Disappear() < 0.1f)
             {
                 GameState state = GameObject.Find("GameState").GetComponent<GameState>();
+                if (state.gameObjects.Contains(this.gameObject))
+                {
+                    state.gameObjects.Remove(this.gameObject);
+                }
                 //if (state.gameObjects.Contains(this.gameObject))
                 //state.gameObjects.
                 Debug.Log("Plate disappeared");
@@ -146,7 +150,7 @@ public class SushiController : MonoBehaviour
                     dragging = true;
                     GetComponent<Rigidbody>().useGravity = false;
                     GetComponent<Rigidbody>().freezeRotation = true;
-                    GetComponent<Renderer>().material.color = Color.green;
+                    GetComponentsInChildren<Renderer>()[0].material.color = Color.green;
 
                     dist = Vector3.Distance(transform.position, Camera.main.transform.position);
                 }
@@ -157,7 +161,7 @@ public class SushiController : MonoBehaviour
             dragging = false;
             GetComponent<Rigidbody>().useGravity = true;
             GetComponent<Rigidbody>().freezeRotation = false;
-            GetComponent<Renderer>().material.color = default_color;
+            GetComponentsInChildren<Renderer>()[0].material.color = default_color;
         }
 
 

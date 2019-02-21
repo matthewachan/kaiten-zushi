@@ -32,7 +32,7 @@ public class ChefController : MonoBehaviour
             plate = Instantiate(sushiPlate);
         plate.transform.position = GameObject.Find("Spawn Point").transform.position;
         GameState state = GameObject.Find("GameState").GetComponent<GameState>();
-        state.gameObjects.Enqueue(plate);
+        state.gameObjects.Add(plate);
         Debug.Log("Number of plates " + state.gameObjects.Count);
     }
 
@@ -51,7 +51,7 @@ public class ChefController : MonoBehaviour
         if (state.gameObjects.Count > 0)
         {
             GameObject light = GameObject.Find("Spot Light");
-            GameObject plate = state.gameObjects.Peek();
+            GameObject plate = (GameObject) state.gameObjects[0];
             light.transform.LookAt(plate.transform);
         }
     }
