@@ -30,8 +30,10 @@ public class ChefController : MonoBehaviour
             plate = Instantiate(sushiPlate);
         else
             plate = Instantiate(sushiPlate);
-        plate.transform.position = GameObject.Find("Spawn Point").transform.position; 
-        GameObject.Find("GameState").GetComponent<GameState>().gameObjects.Enqueue(plate);
+        plate.transform.position = GameObject.Find("Spawn Point").transform.position;
+        GameState state = GameObject.Find("GameState").GetComponent<GameState>();
+        state.gameObjects.Enqueue(plate);
+        Debug.Log("Number of plates " + state.gameObjects.Count);
     }
 
 

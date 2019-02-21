@@ -13,6 +13,8 @@ public class GameState : MonoBehaviour
     public Queue<GameObject> gameObjects;
     public string difficulty;
 
+    public bool paused;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -34,8 +36,9 @@ public class GameState : MonoBehaviour
         KaitenController ctrl = GameObject.Find("Kaiten Zushi").GetComponent<KaitenController>();
 
         canvas.SetActive(false);
-        ctrl.belt_mat.color = Color.white;
+        ctrl.belt_mat.color = Color.gray;
         ctrl.beltSpeed = ctrl.prevSpeed;
+        GameObject.Find("GameState").GetComponent<GameState>().paused = false;
         WakeUpPlates();
     }
 

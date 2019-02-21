@@ -20,12 +20,14 @@ public class SushiController : MonoBehaviour
     private float spawnTime;
     bool destroyed = false;
 
+    private float fadeSpeed = 0.2f;
+
 
     // Start is called before the first frame update
     void Start()
     {
         spawnTime = Time.time;
-        Debug.Log("Spawning in at " + spawnTime);
+        //Debug.Log("Spawning in at " + spawnTime);
         dragging = false;
         default_color = GetComponent<Renderer>().material.color;  
 
@@ -66,20 +68,65 @@ public class SushiController : MonoBehaviour
     }
 
     private void OnTriggerEnter(Collider other)
-    { 
-        if (other.name == "Spawn Point" && (Time.time - spawnTime) > 5 && !destroyed)
+    {
+        if (other.name == "Spawn Point")
         {
-            GameObject.Find("GameState").GetComponent<GameState>().gameObjects.Dequeue();
-            destroyed = true;
-            Debug.Log("Destroy plate");
-            Destroy(this.gameObject);
+            GameState state = GameObject.Find("GameState").GetComponent<GameState>();
+            if ((Time.time - spawnTime) > 0.5f && !destroyed)
+            {
+                state.gameObjects.Dequeue();
+                destroyed = true;
+                Destroy(this.gameObject);
+            }
         }
+
+
+
+    }
+
+    private void OnCollisionStay(Collision collision)
+    {
+        GameObject other = collision.gameObject;
+   
+        if (other.name == "Table")
+        {
+            if (Disappear() < 0.1f)
+            {
+                GameState state = GameObject.Find("GameState").GetComponent<GameState>();
+                //if (state.gameObjects.Contains(this.gameObject))
+                //state.gameObjects.
+                Debug.Log("Plate disappeared");
+                Destroy(this.gameObject);
+            }
+
+        }
+    }
+
+    private float Disappear()
+    {
+        Color old;
+        float alpha = 1;
+        foreach (Renderer child in this.GetComponentsInChildren<Renderer>())
+        {
+            old = child.material.color;
+            alpha = old.a - Time.deltaTime * fadeSpeed;
+            child.material.color = new Color(old.r, old.g, old.b, alpha);
+        }
+        //Color old = this.GetComponent<Renderer>().material.color;
+        //float alpha = old.a - Time.deltaTime * 0.2f;
+        //this.GetComponent<Renderer>().material.color = new Color
+        return alpha;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (isSpecial)
+        GameState state = GameObject.Find("GameState").GetComponent<GameState>();
+        if (GetComponent<Rigidbody>().IsSleeping() && state.paused == false)
+        {
+            GetComponent<Rigidbody>().WakeUp();
+        }
+        if (isSpecial && !dragging)
         {
             inner_marker.transform.RotateAround(transform.position, transform.up, Time.deltaTime * s1);
             inner_sauce.transform.position = inner_marker.transform.position;

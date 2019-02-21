@@ -34,7 +34,8 @@ public class BeltControl : MonoBehaviour
                 if (info.collider.gameObject == this.gameObject)
                 {
                     game_state.canvas.SetActive(true);
-                    GameObject.Find("Panel").transform.position = Input.mousePosition;
+                    game_state.paused = true;
+                    //GameObject.Find("Panel").transform.position = Input.mousePosition;
                     mat.color = Color.green;
 
                     ctrl.prevSpeed = ctrl.beltSpeed;
