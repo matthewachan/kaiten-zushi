@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class SushiController : MonoBehaviour
 {
-    private bool dragging;
+    public bool dragging;
     private float dist;
     private Color default_color;
     public bool isSpecial;
@@ -14,6 +14,8 @@ public class SushiController : MonoBehaviour
     GameObject outer_marker;
     GameObject outer_sauce;
 
+
+
     float s1;
     float s2;
 
@@ -21,6 +23,11 @@ public class SushiController : MonoBehaviour
     bool destroyed = false;
 
     private float fadeSpeed = 0.2f;
+
+
+    public GameObject spherePrefab;
+    GameObject sphere;
+    private float sphereSize = 5f;
 
 
     // Start is called before the first frame update
@@ -69,7 +76,7 @@ public class SushiController : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.name == "Spawn Point")
+        if (other.name == "Spawn Point" && !dragging)
         {
             GameState state = GameObject.Find("GameState").GetComponent<GameState>();
             if ((Time.time - spawnTime) > 0.5f && !destroyed)
@@ -92,15 +99,7 @@ public class SushiController : MonoBehaviour
         {
             if (Disappear() < 0.1f)
             {
-                GameState state = GameObject.Find("GameState").GetComponent<GameState>();
-                if (state.gameObjects.Contains(this.gameObject))
-                {
-                    state.gameObjects.Remove(this.gameObject);
-                }
-                //if (state.gameObjects.Contains(this.gameObject))
-                //state.gameObjects.
-                Debug.Log("Plate disappeared");
-                Destroy(this.gameObject);
+                Break();
             }
 
         }
@@ -116,11 +115,20 @@ public class SushiController : MonoBehaviour
             alpha = old.a - Time.deltaTime * fadeSpeed;
             child.material.color = new Color(old.r, old.g, old.b, alpha);
         }
-        //Color old = this.GetComponent<Renderer>().material.color;
-        //float alpha = old.a - Time.deltaTime * 0.2f;
-        //this.GetComponent<Renderer>().material.color = new Color
         return alpha;
     }
+
+    public void Break()
+    {
+        GameState state = GameObject.Find("GameState").GetComponent<GameState>();
+        if (state.gameObjects.Contains(this.gameObject))
+        {
+            state.gameObjects.Remove(this.gameObject);
+        }
+
+        Destroy(this.gameObject);
+    }
+
 
     // Update is called once per frame
     void Update()
@@ -139,6 +147,7 @@ public class SushiController : MonoBehaviour
             outer_sauce.transform.position = outer_marker.transform.position;
         }
 
+        // Instant where user begins dragging
         if (Input.GetMouseButtonDown(0) && !dragging)
         {
             Ray inputRay = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -153,24 +162,38 @@ public class SushiController : MonoBehaviour
                     GetComponentsInChildren<Renderer>()[0].material.color = Color.green;
 
                     dist = Vector3.Distance(transform.position, Camera.main.transform.position);
+                    sphere = Instantiate(spherePrefab);
+                    sphere.transform.localScale = new Vector3(sphereSize, sphereSize, sphereSize);
+                    sphere.transform.position = this.transform.position;
+
+                    
                 }
             }
         }
+        // User releases plate
         else if (Input.GetMouseButtonUp(0) && dragging)
         {
             dragging = false;
             GetComponent<Rigidbody>().useGravity = true;
             GetComponent<Rigidbody>().freezeRotation = false;
             GetComponentsInChildren<Renderer>()[0].material.color = default_color;
+
+            Destroy(sphere);
         }
-
-
-
+        // Continued dragging
         if (dragging)
         {
             Ray camRay = Camera.main.ScreenPointToRay(Input.mousePosition);
             Vector3 pos = camRay.GetPoint(dist);
-            this.transform.position = new Vector3(pos.x, 1.5f, pos.z);
+
+            float radius = sphere.GetComponent<Renderer>().bounds.extents.magnitude;
+            //radius = sphereSize;
+            float diff = Vector3.Distance(pos, sphere.transform.position);
+            radius /= 2;
+            Debug.Log(radius);
+
+            if (diff < radius)
+                this.transform.position = new Vector3(pos.x, 1.5f, pos.z);
         }
     }
 }

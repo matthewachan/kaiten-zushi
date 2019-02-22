@@ -54,7 +54,8 @@ public class GameState : MonoBehaviour
     {
         foreach (GameObject plate in GameObject.FindGameObjectsWithTag("Plate"))
         {
-            plate.GetComponent<Rigidbody>().WakeUp();
+            if (plate.GetComponent<Rigidbody>() != null)
+                plate.GetComponent<Rigidbody>().WakeUp();
         }
     }
 

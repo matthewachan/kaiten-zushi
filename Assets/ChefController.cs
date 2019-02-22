@@ -11,6 +11,8 @@ public class ChefController : MonoBehaviour
     private int coolDown = 5;
     private float timeStamp;
 
+    private bool setPause = false;
+    private float freezeDelta;
 
     // Start is called before the first frame update
     void Start()
@@ -40,6 +42,24 @@ public class ChefController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        GameState state = GameObject.Find("GameState").GetComponent<GameState>();
+      
+        // Freeze cooldown timer if the game is in a paused state
+        if (state.paused)
+        {
+            if (!setPause)
+            {
+                freezeDelta = timeStamp - Time.time;
+                setPause = true;
+            }
+            else 
+                timeStamp = Time.time + freezeDelta;
+        }
+        else
+        {
+            setPause = false;
+        }
+
         if (timeStamp <= Time.time)
         {
             SpawnPlate();
@@ -47,7 +67,6 @@ public class ChefController : MonoBehaviour
         }
 
         // Focus spotlight on the first plate
-        GameState state = GameObject.Find("GameState").GetComponent<GameState>();
         if (state.gameObjects.Count > 0)
         {
             GameObject light = GameObject.Find("Spot Light");
