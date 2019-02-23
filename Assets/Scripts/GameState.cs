@@ -15,6 +15,9 @@ public class GameState : MonoBehaviour
 
     public bool paused;
 
+    public int platesBroken;
+    public int platesConsumed;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -26,8 +29,10 @@ public class GameState : MonoBehaviour
         GameObject.Find("Escape").GetComponent<Button>().onClick.AddListener(CloseWindow);
         canvas.SetActive(false);
 
-        //paused = false;
+        paused = false;
         difficulty = "easy";
+        platesBroken = 0;
+        platesConsumed = 0;
 
     }
 
@@ -68,7 +73,14 @@ public class GameState : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (canvas.active)
+        GameObject[] systems = GameObject.FindGameObjectsWithTag("ParticleSystem");
+
+        foreach (GameObject ps in systems)
+        {
+            if (!ps.GetComponent<ParticleSystem>().IsAlive())
+                Destroy(ps);
+        }
+        if (canvas.activeInHierarchy)
             GameObject.Find("Value").GetComponent<Text>().text = GameObject.Find("Kaiten Zushi").GetComponent<KaitenController>().prevSpeed.ToString();
 
     }

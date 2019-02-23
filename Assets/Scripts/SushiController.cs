@@ -14,7 +14,7 @@ public class SushiController : MonoBehaviour
     GameObject outer_marker;
     GameObject outer_sauce;
 
-
+    public GameObject breakPrefab;
 
     float s1;
     float s2;
@@ -29,10 +29,20 @@ public class SushiController : MonoBehaviour
     GameObject sphere;
     private float sphereSize = 5f;
 
+    GameState state;
+
+    private AudioSource audioSrc;
+    public AudioClip audioClip;
+
 
     // Start is called before the first frame update
     void Start()
     {
+        //audioSrc = new AudioSource();
+        //audioSrc.clip = audioClip;
+        //audioSrc.Play();
+
+        state = GameObject.Find("GameState").GetComponent<GameState>();
         spawnTime = Time.time;
         //Debug.Log("Spawning in at " + spawnTime);
         dragging = false;
@@ -78,12 +88,11 @@ public class SushiController : MonoBehaviour
     {
         if (other.name == "Spawn Point" && !dragging)
         {
-            GameState state = GameObject.Find("GameState").GetComponent<GameState>();
             if ((Time.time - spawnTime) > 0.5f && !destroyed)
             {
                 state.gameObjects.Remove(state.gameObjects[0]);
                 destroyed = true;
-                Destroy(this.gameObject);
+                Break();
             }
         }
 
@@ -97,17 +106,28 @@ public class SushiController : MonoBehaviour
    
         if (other.name == "Table")
         {
-            if (Disappear() < 0.1f)
+            if (MakeTransparent() < 0.1f)
             {
-                Break();
+                Consume();
             }
 
         }
+        else if (other.name == "Floor")
+        {
+            Break();
+        }
+        else if (other.tag == "Plate")
+        {
+            Break();
+        }
+
     }
 
-    private float Disappear()
+    private float MakeTransparent()
     {
         Color old;
+
+
         float alpha = 1;
         foreach (Renderer child in this.GetComponentsInChildren<Renderer>())
         {
@@ -118,22 +138,35 @@ public class SushiController : MonoBehaviour
         return alpha;
     }
 
-    public void Break()
+    public void Consume()
     {
-        GameState state = GameObject.Find("GameState").GetComponent<GameState>();
         if (state.gameObjects.Contains(this.gameObject))
         {
             state.gameObjects.Remove(this.gameObject);
+            Destroy(this.gameObject);
+        }
+    }
+
+    public void Break()
+    {   
+        if (state.gameObjects.Contains(this.gameObject))
+        {
+            state.gameObjects.Remove(this.gameObject);
+            GameObject smoke = Instantiate(breakPrefab);
+            smoke.transform.position = this.transform.position;
+
+            GetComponent<AudioSource>().Play();
+            Destroy(this.gameObject, 1);
         }
 
-        Destroy(this.gameObject);
     }
 
 
     // Update is called once per frame
     void Update()
     {
-        GameState state = GameObject.Find("GameState").GetComponent<GameState>();
+        //GetComponent<AudioSource>().Play();
+
         if (GetComponent<Rigidbody>().IsSleeping() && state.paused == false)
         {
             GetComponent<Rigidbody>().WakeUp();
