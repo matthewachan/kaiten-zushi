@@ -27,11 +27,11 @@ public class ChefController : MonoBehaviour
         int rand = Random.Range(0, 3);
         GameObject plate;
         if (rand == 0)
-            plate = Instantiate(sushiPlate);
+            plate = Instantiate(dessertPlate);
         else if (rand == 1)
-            plate = Instantiate(specialPlate);
+            plate = Instantiate(dessertPlate);
         else
-            plate = Instantiate(sushiPlate);
+            plate = Instantiate(dessertPlate);
         plate.transform.position = GameObject.Find("Spawn Point").transform.position;
         GameState state = GameObject.Find("GameState").GetComponent<GameState>();
         state.gameObjects.Add(plate);

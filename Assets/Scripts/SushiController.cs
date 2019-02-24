@@ -8,11 +8,16 @@ public class SushiController : MonoBehaviour
     private float dist;
     private Color default_color;
     public bool isSpecial;
+    public bool isDessert;
 
     GameObject inner_sauce;
     GameObject inner_marker;
     GameObject outer_marker;
     GameObject outer_sauce;
+
+    GameObject dessertTracker;
+    GameObject iceCream;
+    GameObject dessertCenter;
 
     public GameObject breakPrefab;
 
@@ -44,6 +49,14 @@ public class SushiController : MonoBehaviour
         //spawnTime = Time.time;
         dragging = false;
         default_color = GetComponentsInChildren<Renderer>()[0].material.color;  
+
+        if (isDessert)
+        {
+            dessertTracker = this.transform.Find("Tracker").gameObject;
+            iceCream = this.transform.Find("Ice Cream").gameObject;
+            dessertCenter = this.transform.Find("Center").gameObject;
+
+        }
 
         if (isSpecial)
         {
@@ -181,6 +194,17 @@ public class SushiController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (isDessert)
+        {
+            //Debug.Log("ASDLFJASDF");
+            //iceCream.transform.Translate(Vector3.up);
+            dessertCenter.transform.Rotate(new Vector3(Time.deltaTime * 1, 0, 0));
+            dessertTracker.transform.RotateAround(dessertCenter.transform.position, dessertCenter.transform.forward, Time.deltaTime * 20);
+            iceCream.transform.position = dessertTracker.transform.position;
+            //outer_marker.transform.RotateAround(transform.position, transform.up, Time.deltaTime * outer_speed * outer_direction);
+            //outer_sauce.transform.position = outer_marker.transform.position;
+        }
+
         // Change plate color when selected
         if (state.selectedObj == this.gameObject)
             ChangeColor(state.selectedColor);
