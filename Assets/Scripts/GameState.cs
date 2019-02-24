@@ -28,6 +28,9 @@ public class GameState : MonoBehaviour
 
     Color highlightColor = Color.green;
 
+    Vector3 camPos;
+    Quaternion camRot;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -49,13 +52,25 @@ public class GameState : MonoBehaviour
         saucePanel.transform.Find("Escape").GetComponent<Button>().onClick.AddListener(CloseWindow);
         saucePanel.SetActive(false);
 
+        camPos = Camera.main.transform.position;
+        camRot = Camera.main.transform.rotation;
+
         GameObject.Find("Camera Button").GetComponent<Button>().onClick.AddListener(OpenCamPanel);
 
         camPanel = GameObject.Find("Camera Panel");
         ToggleRestaurantMode();
+
+        camPanel.transform.Find("Yaw").GetComponentInChildren<Slider>().onValueChanged.AddListener(SetCameraRotation);
+        camPanel.transform.Find("Pitch").GetComponentInChildren<Slider>().onValueChanged.AddListener(SetCameraRotation);
+
+
+
         camPanel.transform.Find("Restaurant Mode").GetComponent<Button>().onClick.AddListener(ToggleRestaurantMode);
         camPanel.transform.Find("Player Mode").GetComponent<Button>().onClick.AddListener(TogglePlayerMode);
         camPanel.transform.Find("Escape").GetComponent<Button>().onClick.AddListener(CloseWindow);
+        camPanel.transform.Find("Forward").GetComponent<Button>().onClick.AddListener(MoveCameraForward);
+        camPanel.transform.Find("Backward").GetComponent<Button>().onClick.AddListener(MoveCameraBackward);
+
         camPanel.SetActive(false);
 
         paused = false;
@@ -64,6 +79,40 @@ public class GameState : MonoBehaviour
         platesConsumed = 0;
 
     }
+    void SetCameraRotation(float value)
+    {
+        Slider pitchSlider = camPanel.transform.Find("Pitch").GetComponentInChildren<Slider>();
+        float pitchAngle = Mathf.Lerp(-180, 180, pitchSlider.normalizedValue);
+
+        Slider yawSlider = camPanel.transform.Find("Yaw").GetComponentInChildren<Slider>();
+        float yawAngle = Mathf.Lerp(-180, 180, yawSlider.normalizedValue);
+
+        Camera.main.transform.localRotation = Quaternion.Euler(pitchAngle, yawAngle, 0);
+    }
+    //void SetCameraYaw(float value)
+    //{
+    //    Slider pitchSlider = camPanel.transform.Find("Pitch").GetComponentInChildren<Slider>();
+    //    float pitchAngle = Mathf.Lerp(-180, 180, pitchSlider.normalizedValue);
+
+    //    Slider yawSlider = camPanel.transform.Find("Yaw").GetComponentInChildren<Slider>();
+    //    float yawAngle = Mathf.Lerp(-180, 180, yawSlider.normalizedValue);
+
+    //    //Vector3 old = Camera.main.transform.localRotation.eulerAngles;
+    //    Camera.main.transform.localRotation = Quaternion.Euler(pitchAngle, yawAngle, 0);
+
+    //}
+
+    //void SetCameraPitch(float value)
+    //{
+    //    Slider pitchSlider = camPanel.transform.Find("Pitch").GetComponentInChildren<Slider>();
+    //    float pitchAngle = Mathf.Lerp(-180, 180, pitchSlider.normalizedValue);
+
+    //    Slider yawSlider = camPanel.transform.Find("Yaw").GetComponentInChildren<Slider>();
+    //    float yawAngle = Mathf.Lerp(-180, 180, yawSlider.normalizedValue);
+
+    //    //Vector3 old = Camera.main.transform.localRotation.eulerAngles;
+    //    Camera.main.transform.localRotation = Quaternion.Euler(pitchAngle, yawAngle, 0);
+    //}
 
     void OpenCamPanel()
     {
@@ -80,11 +129,27 @@ public class GameState : MonoBehaviour
         cb.normalColor = Color.white;
         camPanel.transform.Find("Player Mode").GetComponent<Button>().colors = cb;
 
+        Camera.main.transform.position = camPos;
+        Camera.main.transform.rotation = camRot;
+
+
         camPanel.transform.Find("Pitch").gameObject.SetActive(false);
         camPanel.transform.Find("Yaw").gameObject.SetActive(false);
         camPanel.transform.Find("Speed").gameObject.SetActive(false);
         camPanel.transform.Find("Backward").gameObject.SetActive(false);
         camPanel.transform.Find("Forward").gameObject.SetActive(false);
+    }
+
+    public void MoveCameraForward()
+    {
+        float speed = camPanel.transform.Find("Speed").GetComponentInChildren<Slider>().value;
+        Camera.main.transform.Translate(Vector3.forward * speed);
+    }
+
+    void MoveCameraBackward()
+    {
+        float speed = camPanel.transform.Find("Speed").GetComponentInChildren<Slider>().value;
+        Camera.main.transform.Translate(Vector3.back * speed);
     }
 
     void TogglePlayerMode()
@@ -96,6 +161,13 @@ public class GameState : MonoBehaviour
         cb = camPanel.transform.Find("Restaurant Mode").GetComponent<Button>().colors;
         cb.normalColor = Color.white;
         camPanel.transform.Find("Restaurant Mode").GetComponent<Button>().colors = cb;
+
+        Camera.main.transform.position = camPos;
+        Camera.main.transform.rotation = camRot;
+
+        // Update slider values
+        camPanel.transform.Find("Yaw").GetComponentInChildren<Slider>().value = Camera.main.transform.rotation.eulerAngles.y;
+        camPanel.transform.Find("Pitch").GetComponentInChildren<Slider>().value = Camera.main.transform.rotation.eulerAngles.x;
 
         camPanel.transform.Find("Pitch").gameObject.SetActive(true);
         camPanel.transform.Find("Yaw").gameObject.SetActive(true);
@@ -171,15 +243,6 @@ public class GameState : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // Disable player mode menu options
-        if (restaurantMode)
-        {
-            //camPanel.transform.Find("Pitch").gameObject.SetActive(false);
-            //camPanel.transform.Find("Yaw").gameObject.SetActive(false);
-            //camPanel.transform.Find("Speed").gameObject.SetActive(false);
-            //camPanel.transform.Find("Backward").gameObject.SetActive(false);
-            //camPanel.transform.Find("Forward").gameObject.SetActive(false);
-        }
 
         GameObject[] systems = GameObject.FindGameObjectsWithTag("ParticleSystem");
 

@@ -58,14 +58,14 @@ public class SushiController : MonoBehaviour
             inner_marker.transform.SetParent(transform);
             inner_marker.transform.localScale = Vector3.zero;
             inner_marker.transform.position = transform.position;
-            inner_marker.transform.position += new Vector3(r1, 2, 0);
+            inner_marker.transform.position += new Vector3(r1, 0, 0);
 
 
             outer_marker = new GameObject();
             outer_marker.transform.SetParent(transform);
             outer_marker.transform.localScale = Vector3.zero;
             outer_marker.transform.position = transform.position;
-            outer_marker.transform.position += new Vector3(r2, 2, 0);
+            outer_marker.transform.position += new Vector3(r2, 0, 0);
 
 
             inner_sauce = Instantiate(saucePrefab);
@@ -230,7 +230,7 @@ public class SushiController : MonoBehaviour
         {
             dragging = false;
             GetComponent<Rigidbody>().useGravity = true;
-            GetComponent<Rigidbody>().freezeRotation = false;
+            GetComponent<Rigidbody>().freezeRotation = true;
             GetComponentsInChildren<Renderer>()[0].material.color = default_color;
 
             Destroy(sphere);

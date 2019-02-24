@@ -1541,7 +1541,7 @@ Camera:
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 60
-  orthographic: 1
+  orthographic: 0
   orthographic size: 4.5
   m_Depth: -1
   m_CullingMask:
@@ -3106,7 +3106,7 @@ RectTransform:
   m_Children:
   - {fileID: 278955006}
   m_Father: {fileID: 1468607658}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -3376,7 +3376,7 @@ RectTransform:
   m_Children:
   - {fileID: 1405251844}
   m_Father: {fileID: 1468607658}
-  m_RootOrder: 2
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -3722,10 +3722,10 @@ MonoBehaviour:
   m_FillRect: {fileID: 619942795}
   m_HandleRect: {fileID: 1434690726}
   m_Direction: 0
-  m_MinValue: 0
-  m_MaxValue: 1
+  m_MinValue: 1
+  m_MaxValue: 10
   m_WholeNumbers: 0
-  m_Value: 0
+  m_Value: 1
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -3865,8 +3865,8 @@ MonoBehaviour:
   m_FillRect: {fileID: 1022444372}
   m_HandleRect: {fileID: 1715466978}
   m_Direction: 0
-  m_MinValue: 0
-  m_MaxValue: 1
+  m_MinValue: -180
+  m_MaxValue: 180
   m_WholeNumbers: 0
   m_Value: 0
   m_OnValueChanged:
@@ -3953,8 +3953,8 @@ MonoBehaviour:
   m_FillRect: {fileID: 968208951}
   m_HandleRect: {fileID: 358314025}
   m_Direction: 0
-  m_MinValue: 0
-  m_MaxValue: 1
+  m_MinValue: -180
+  m_MaxValue: 180
   m_WholeNumbers: 0
   m_Value: 0
   m_OnValueChanged:
@@ -4552,9 +4552,9 @@ RectTransform:
   m_Children:
   - {fileID: 1809092356}
   - {fileID: 2058277421}
-  - {fileID: 1182375609}
   - {fileID: 1608869450}
   - {fileID: 1074601397}
+  - {fileID: 1182375609}
   - {fileID: 229099141}
   - {fileID: 1410934312}
   - {fileID: 499328747}
@@ -5145,7 +5145,7 @@ RectTransform:
   m_Children:
   - {fileID: 1865244190}
   m_Father: {fileID: 1468607658}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
