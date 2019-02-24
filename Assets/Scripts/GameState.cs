@@ -59,19 +59,22 @@ public class GameState : MonoBehaviour
 
         camPanel = GameObject.Find("Camera Panel");
         ToggleRestaurantMode();
+        SetDifficultyEasy();
+
 
         camPanel.transform.Find("Yaw").GetComponentInChildren<Slider>().onValueChanged.AddListener(SetCameraRotation);
         camPanel.transform.Find("Pitch").GetComponentInChildren<Slider>().onValueChanged.AddListener(SetCameraRotation);
 
 
-
+        camPanel.transform.Find("Hard").GetComponent<Button>().onClick.AddListener(SetDifficultyHard);
+        camPanel.transform.Find("Easy").GetComponent<Button>().onClick.AddListener(SetDifficultyEasy);
         camPanel.transform.Find("Restaurant Mode").GetComponent<Button>().onClick.AddListener(ToggleRestaurantMode);
         camPanel.transform.Find("Player Mode").GetComponent<Button>().onClick.AddListener(TogglePlayerMode);
         camPanel.transform.Find("Escape").GetComponent<Button>().onClick.AddListener(CloseWindow);
         camPanel.transform.Find("Forward").GetComponent<Button>().onClick.AddListener(MoveCameraForward);
         camPanel.transform.Find("Backward").GetComponent<Button>().onClick.AddListener(MoveCameraBackward);
 
-        camPanel.SetActive(false);
+        camPanel.SetActive(true);
 
         paused = false;
         difficulty = "easy";
@@ -89,30 +92,7 @@ public class GameState : MonoBehaviour
 
         Camera.main.transform.localRotation = Quaternion.Euler(pitchAngle, yawAngle, 0);
     }
-    //void SetCameraYaw(float value)
-    //{
-    //    Slider pitchSlider = camPanel.transform.Find("Pitch").GetComponentInChildren<Slider>();
-    //    float pitchAngle = Mathf.Lerp(-180, 180, pitchSlider.normalizedValue);
 
-    //    Slider yawSlider = camPanel.transform.Find("Yaw").GetComponentInChildren<Slider>();
-    //    float yawAngle = Mathf.Lerp(-180, 180, yawSlider.normalizedValue);
-
-    //    //Vector3 old = Camera.main.transform.localRotation.eulerAngles;
-    //    Camera.main.transform.localRotation = Quaternion.Euler(pitchAngle, yawAngle, 0);
-
-    //}
-
-    //void SetCameraPitch(float value)
-    //{
-    //    Slider pitchSlider = camPanel.transform.Find("Pitch").GetComponentInChildren<Slider>();
-    //    float pitchAngle = Mathf.Lerp(-180, 180, pitchSlider.normalizedValue);
-
-    //    Slider yawSlider = camPanel.transform.Find("Yaw").GetComponentInChildren<Slider>();
-    //    float yawAngle = Mathf.Lerp(-180, 180, yawSlider.normalizedValue);
-
-    //    //Vector3 old = Camera.main.transform.localRotation.eulerAngles;
-    //    Camera.main.transform.localRotation = Quaternion.Euler(pitchAngle, yawAngle, 0);
-    //}
 
     void OpenCamPanel()
     {
@@ -176,6 +156,37 @@ public class GameState : MonoBehaviour
         camPanel.transform.Find("Forward").gameObject.SetActive(true);
     }
 
+    void SetDifficultyHard()
+    {
+        ColorBlock cb = camPanel.transform.Find("Hard").GetComponent<Button>().colors;
+        cb.normalColor = highlightColor;
+        camPanel.transform.Find("Hard").GetComponent<Button>().colors = cb;
+
+        cb = camPanel.transform.Find("Easy").GetComponent<Button>().colors;
+        cb.normalColor = Color.white;
+        camPanel.transform.Find("Easy").GetComponent<Button>().colors = cb;
+
+        foreach (GameObject tray in GameObject.FindGameObjectsWithTag("Tray"))
+        {
+            tray.GetComponent<TrayControl>().difficulty = "hard";
+        }
+    }
+
+    void SetDifficultyEasy()
+    {
+        ColorBlock cb = camPanel.transform.Find("Easy").GetComponent<Button>().colors;
+        cb.normalColor = highlightColor;
+        camPanel.transform.Find("Easy").GetComponent<Button>().colors = cb;
+
+        cb = camPanel.transform.Find("Hard").GetComponent<Button>().colors;
+        cb.normalColor = Color.white;
+        camPanel.transform.Find("Hard").GetComponent<Button>().colors = cb;
+
+        foreach (GameObject tray in GameObject.FindGameObjectsWithTag("Tray")) {
+            tray.GetComponent<TrayControl>().difficulty = "easy";
+        }
+    }
+
     void ChangeOrbitDirection()
     {
         if (selectedObj.name == "Inner Sauce Plate")
@@ -198,6 +209,7 @@ public class GameState : MonoBehaviour
     void CloseWindow()
     {
         KaitenController ctrl = GameObject.Find("Kaiten Zushi").GetComponent<KaitenController>();
+        Debug.Log("DISABLE");
 
         if (beltPanel.activeInHierarchy)
         {

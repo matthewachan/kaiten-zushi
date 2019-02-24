@@ -4,10 +4,12 @@ using UnityEngine;
 
 public class TrayControl : MonoBehaviour
 {
+
+    public string difficulty;
     // Start is called before the first frame update
     void Start()
     {
-        
+        difficulty = "easy";
     }
 
     // Update is called once per frame
@@ -21,7 +23,7 @@ public class TrayControl : MonoBehaviour
         GameObject other = collision.gameObject;
         Vector3 target = this.transform.TransformPoint(Vector3.back + (Vector3.left / 3));
         float speed = GameObject.Find("Kaiten Zushi").GetComponent<KaitenController>().beltSpeed;
-        if (other.tag == "Plate")
+        if (other.tag == "Plate" && difficulty == "easy")
         {
             other.transform.position = Vector3.MoveTowards(other.transform.position, target, speed * Time.deltaTime);
         }

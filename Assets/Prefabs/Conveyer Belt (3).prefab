@@ -153,8 +153,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93fac5d244a5c1c4c921c69343c9358a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 15
-  menu: {fileID: 4590752207493758394, guid: 36142b2d819550e4987744e4a94fefbc, type: 3}
 --- !u!1 &1967655722
 GameObject:
   m_ObjectHideFlags: 0
@@ -172,7 +170,7 @@ GameObject:
   - component: {fileID: 1967655725}
   m_Layer: 2
   m_Name: Tray
-  m_TagString: Untagged
+  m_TagString: Tray
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -290,3 +288,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84f7edcc110073f49aa1a94940047a0a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  difficulty: 
