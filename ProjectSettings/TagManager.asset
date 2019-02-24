@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Plate
   - ParticleSystem
+  - Sauce
   layers:
   - Default
   - TransparentFX

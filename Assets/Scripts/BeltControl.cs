@@ -21,7 +21,7 @@ public class BeltControl : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (game_state.selectedObj != this.gameObject && Input.GetMouseButtonDown(0))
         {
             /* Return if the mouse is over a UI object */
             if (UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
@@ -33,7 +33,7 @@ public class BeltControl : MonoBehaviour
             {
                 if (info.collider.gameObject == this.gameObject)
                 {
-                    game_state.canvas.SetActive(true);
+                    game_state.beltPanel.SetActive(true);
                     game_state.paused = true;
                     //GameObject.Find("Panel").transform.position = Input.mousePosition;
                     mat.color = Color.green;

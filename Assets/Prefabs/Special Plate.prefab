@@ -129,7 +129,8 @@ MonoBehaviour:
   breakPrefab: {fileID: 2036707855, guid: 9b38dfea840a64a529d846dd3d5f1d90, type: 3}
   spherePrefab: {fileID: 4046536443566965468, guid: 6b0bcd09791104b9a912d0b0becd6867,
     type: 3}
-  audioClip: {fileID: 0}
+  saucePrefab: {fileID: 1574056667402491219, guid: 28408f28f566c4a51991e296a315188b,
+    type: 3}
 --- !u!82 &8219185803307979415
 AudioSource:
   m_ObjectHideFlags: 0

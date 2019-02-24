@@ -29,7 +29,7 @@ public class ChefController : MonoBehaviour
         if (rand == 0)
             plate = Instantiate(sushiPlate);
         else if (rand == 1)
-            plate = Instantiate(sushiPlate);
+            plate = Instantiate(specialPlate);
         else
             plate = Instantiate(sushiPlate);
         plate.transform.position = GameObject.Find("Spawn Point").transform.position;

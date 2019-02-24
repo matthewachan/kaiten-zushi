@@ -16,8 +16,8 @@ public class SushiController : MonoBehaviour
 
     public GameObject breakPrefab;
 
-    float s1;
-    float s2;
+    public float inner_speed;
+    public float outer_speed;
 
     private float spawnTime;
     bool destroyed = false;
@@ -31,20 +31,15 @@ public class SushiController : MonoBehaviour
 
     GameState state;
 
-    private AudioSource audioSrc;
-    public AudioClip audioClip;
+    public GameObject saucePrefab;
 
 
     // Start is called before the first frame update
     void Start()
     {
-        //audioSrc = new AudioSource();
-        //audioSrc.clip = audioClip;
-        //audioSrc.Play();
 
         state = GameObject.Find("GameState").GetComponent<GameState>();
         spawnTime = Time.time;
-        //Debug.Log("Spawning in at " + spawnTime);
         dragging = false;
         default_color = GetComponentsInChildren<Renderer>()[0].material.color;  
 
@@ -52,8 +47,8 @@ public class SushiController : MonoBehaviour
         {
             float r1 = 0.3f;
             float r2 = 0.6f;
-            s1 = 20;
-            s2 = 50;
+            inner_speed = 20;
+            outer_speed = 50;
 
             inner_marker = new GameObject();
             inner_marker.transform.SetParent(transform);
@@ -69,14 +64,16 @@ public class SushiController : MonoBehaviour
             outer_marker.transform.position += new Vector3(r2, 2, 0);
 
 
-            inner_sauce = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            inner_sauce.GetComponent<BoxCollider>().enabled = false;
+            inner_sauce = Instantiate(saucePrefab);
+            inner_sauce.name = "Inner Sauce Plate";
+            inner_sauce.GetComponent<BoxCollider>().isTrigger = true;
             inner_sauce.transform.SetParent(transform);
             inner_sauce.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
             inner_sauce.GetComponent<Renderer>().material.color = Color.blue;
 
-            outer_sauce = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            outer_sauce.GetComponent<BoxCollider>().enabled = false;
+            outer_sauce = Instantiate(saucePrefab);
+            outer_sauce.name = "Outer Sauce Plate";
+            outer_sauce.GetComponent<BoxCollider>().isTrigger = true;
             outer_sauce.transform.SetParent(transform);
             outer_sauce.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
             outer_sauce.GetComponent<Renderer>().material.color = Color.red;
@@ -90,13 +87,24 @@ public class SushiController : MonoBehaviour
         {
             if ((Time.time - spawnTime) > 0.5f && !destroyed)
             {
-                state.gameObjects.Remove(state.gameObjects[0]);
                 destroyed = true;
                 Break();
             }
         }
 
+    }
 
+    void ChangeColor(Color c)
+    {
+        foreach (Renderer rend in this.GetComponentsInChildren<Renderer>())
+        {
+            // Don't recolor sauce
+            if (rend.gameObject.tag == "Sauce")
+                continue;
+
+            float alpha = rend.material.color.a;
+            rend.material.color = new Color(c.r, c.g, c.b, alpha);
+        }
 
     }
 
@@ -143,6 +151,7 @@ public class SushiController : MonoBehaviour
         if (state.gameObjects.Contains(this.gameObject))
         {
             state.gameObjects.Remove(this.gameObject);
+            state.platesConsumed++;
             Destroy(this.gameObject);
         }
     }
@@ -152,11 +161,13 @@ public class SushiController : MonoBehaviour
         if (state.gameObjects.Contains(this.gameObject))
         {
             state.gameObjects.Remove(this.gameObject);
+            state.platesBroken++;
+
             GameObject smoke = Instantiate(breakPrefab);
             smoke.transform.position = this.transform.position;
 
             GetComponent<AudioSource>().Play();
-            Destroy(this.gameObject, 1);
+            Destroy(this.gameObject, GetComponent<AudioSource>().clip.length);
         }
 
     }
@@ -165,18 +176,23 @@ public class SushiController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //GetComponent<AudioSource>().Play();
+        // Change plate color when selected
+        if (state.selectedObj == this.gameObject)
+            ChangeColor(state.selectedColor);
+        else
+            ChangeColor(default_color);
 
+        // Bugfix: Wake up Rigidbody if the game is not paused
         if (GetComponent<Rigidbody>().IsSleeping() && state.paused == false)
-        {
             GetComponent<Rigidbody>().WakeUp();
-        }
-        if (isSpecial && !dragging)
+
+        // Freeze sauce plates when a special plate is selected
+        if (isSpecial && state.selectedObj != this.gameObject)
         {
-            inner_marker.transform.RotateAround(transform.position, transform.up, Time.deltaTime * s1);
+            inner_marker.transform.RotateAround(transform.position, transform.up, Time.deltaTime * inner_speed);
             inner_sauce.transform.position = inner_marker.transform.position;
 
-            outer_marker.transform.RotateAround(transform.position, transform.up, Time.deltaTime * s2);
+            outer_marker.transform.RotateAround(transform.position, transform.up, Time.deltaTime * outer_speed);
             outer_sauce.transform.position = outer_marker.transform.position;
         }
 
