@@ -23,19 +23,19 @@ public class ChefController : MonoBehaviour
 
     void SpawnPlate()
     {
-        Debug.Log("Instantiating Plate");
+        //Debug.Log("Instantiating Plate");
         int rand = Random.Range(0, 3);
         GameObject plate;
         if (rand == 0)
-            plate = Instantiate(dessertPlate);
+            plate = Instantiate(sushiPlate);
         else if (rand == 1)
-            plate = Instantiate(dessertPlate);
+            plate = Instantiate(specialPlate);
         else
             plate = Instantiate(dessertPlate);
         plate.transform.position = GameObject.Find("Spawn Point").transform.position;
         GameState state = GameObject.Find("GameState").GetComponent<GameState>();
         state.gameObjects.Add(plate);
-        Debug.Log("Number of plates " + state.gameObjects.Count);
+        //Debug.Log("Number of plates " + state.gameObjects.Count);
     }
 
 

@@ -24,7 +24,7 @@ public class GameState : MonoBehaviour
     public GameObject saucePanel;
     public GameObject camPanel;
 
-    bool restaurantMode;
+    //bool restaurantMode;
 
     Color highlightColor = Color.green;
 
@@ -34,15 +34,16 @@ public class GameState : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        restaurantMode = true;
+        //restaurantMode = true;
 
         gameObjects = new ArrayList();
 
         canvas = GameObject.Find("Canvas");
 
         beltPanel = GameObject.Find("Belt Panel");
-        beltPanel.transform.Find("Plus").GetComponent<Button>().onClick.AddListener(IncreaseSpeed);
-        beltPanel.transform.Find("Minus").GetComponent<Button>().onClick.AddListener(ReduceSpeed);
+        beltPanel.transform.Find("Slider").GetComponent<Slider>().onValueChanged.AddListener(SetBeltSpeed);
+        //beltPanel.transform.Find("Plus").GetComponent<Button>().onClick.AddListener(IncreaseSpeed);
+        //beltPanel.transform.Find("Minus").GetComponent<Button>().onClick.AddListener(ReduceSpeed);
         beltPanel.transform.Find("Escape").GetComponent<Button>().onClick.AddListener(CloseWindow);
         beltPanel.SetActive(false);
     
@@ -82,6 +83,15 @@ public class GameState : MonoBehaviour
         platesConsumed = 0;
 
     }
+
+    void SetBeltSpeed(float value)
+    {
+        KaitenController ctrl = GameObject.Find("Kaiten Zushi").GetComponent<KaitenController>();
+        ctrl.prevSpeed = (int) value;
+        //if (ctrl.prevSpeed > 0)
+            //ctrl.prevSpeed--;
+    }
+
     void SetCameraRotation(float value)
     {
         Slider pitchSlider = camPanel.transform.Find("Pitch").GetComponentInChildren<Slider>();
@@ -97,6 +107,8 @@ public class GameState : MonoBehaviour
     void OpenCamPanel()
     {
         camPanel.SetActive(true);
+        DeactivateBeltPanel();
+        saucePanel.SetActive(false);
     }
 
     void ToggleRestaurantMode()
@@ -206,18 +218,23 @@ public class GameState : MonoBehaviour
             ctrl.outer_speed = newSpeed;
     }
 
+    void DeactivateBeltPanel()
+    {
+        KaitenController ctrl = GameObject.Find("Kaiten Zushi").GetComponent<KaitenController>();
+        beltPanel.SetActive(false);
+        ctrl.belt_mat.color = Color.gray;
+        ctrl.beltSpeed = ctrl.prevSpeed;
+        GameObject.Find("GameState").GetComponent<GameState>().paused = false;
+        WakeUpPlates();
+    }
+
     void CloseWindow()
     {
         KaitenController ctrl = GameObject.Find("Kaiten Zushi").GetComponent<KaitenController>();
-        Debug.Log("DISABLE");
 
         if (beltPanel.activeInHierarchy)
         {
-            beltPanel.SetActive(false);
-            ctrl.belt_mat.color = Color.gray;
-            ctrl.beltSpeed = ctrl.prevSpeed;
-            GameObject.Find("GameState").GetComponent<GameState>().paused = false;
-            WakeUpPlates();
+            DeactivateBeltPanel();
         }
         else if (saucePanel.activeInHierarchy)
         {
@@ -276,8 +293,12 @@ public class GameState : MonoBehaviour
                 selectedObj = info.collider.gameObject;
                 if (selectedObj.tag == "Sauce")
                 {
-                    Debug.Log("Selected sauce");
+                    //Debug.Log("Selected sauce");
                     saucePanel.SetActive(true);
+                    DeactivateBeltPanel();
+                    //beltPanel.SetActive(false);
+                    camPanel.SetActive(false);
+
                     SushiController sushiController = selectedObj.GetComponentInParent<SushiController>();
                     if (selectedObj.name == "Inner Sauce Plate")
                         saucePanel.transform.Find("Slider").GetComponent<Slider>().value = sushiController.inner_speed;
@@ -294,8 +315,11 @@ public class GameState : MonoBehaviour
             if (!ps.GetComponent<ParticleSystem>().IsAlive())
                 Destroy(ps);
         }
+
+        KaitenController ctrl = GameObject.Find("Kaiten Zushi").GetComponent<KaitenController>();
         if (beltPanel.activeInHierarchy)
-            GameObject.Find("Value").GetComponent<Text>().text = GameObject.Find("Kaiten Zushi").GetComponent<KaitenController>().prevSpeed.ToString();
+            beltPanel.transform.Find("Slider").GetComponent<Slider>().value = ctrl.prevSpeed;
+            //GameObject.Find("Value").GetComponent<Text>().text = GameObject.Find("Kaiten Zushi").GetComponent<KaitenController>().prevSpeed.ToString();
 
     }
 }

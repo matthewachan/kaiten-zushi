@@ -56,6 +56,10 @@ public class SushiController : MonoBehaviour
             iceCream = this.transform.Find("Ice Cream").gameObject;
             dessertCenter = this.transform.Find("Center").gameObject;
 
+            float rad = 0.1f;
+
+            dessertCenter.transform.position = this.transform.position + new Vector3(0, 0.25f, 0);
+            dessertTracker.transform.position = dessertCenter.transform.position - new Vector3(0, rad, 0);
         }
 
         if (isSpecial)
@@ -196,13 +200,11 @@ public class SushiController : MonoBehaviour
     {
         if (isDessert)
         {
-            //Debug.Log("ASDLFJASDF");
-            //iceCream.transform.Translate(Vector3.up);
-            dessertCenter.transform.Rotate(new Vector3(Time.deltaTime * 1, 0, 0));
-            dessertTracker.transform.RotateAround(dessertCenter.transform.position, dessertCenter.transform.forward, Time.deltaTime * 20);
+            float tiltSpeed = 2f;
+            float orbitSpeed = 50f;
+            dessertCenter.transform.Rotate(new Vector3(Time.deltaTime * tiltSpeed, 0, 0));
+            dessertTracker.transform.RotateAround(dessertCenter.transform.position, dessertCenter.transform.forward, Time.deltaTime * orbitSpeed);
             iceCream.transform.position = dessertTracker.transform.position;
-            //outer_marker.transform.RotateAround(transform.position, transform.up, Time.deltaTime * outer_speed * outer_direction);
-            //outer_sauce.transform.position = outer_marker.transform.position;
         }
 
         // Change plate color when selected
