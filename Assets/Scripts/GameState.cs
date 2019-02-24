@@ -56,28 +56,20 @@ public class GameState : MonoBehaviour
     void ChangeOrbitDirection()
     {
         if (selectedObj.name == "Inner Sauce Plate")
-        {
-            selectedObj.GetComponentInParent<SushiController>().inner_speed *= -1;
-        }
+            selectedObj.GetComponentInParent<SushiController>().inner_direction *= -1;
         else
-        {
-            selectedObj.GetComponentInParent<SushiController>().outer_speed *= -1;
-        }
+            selectedObj.GetComponentInParent<SushiController>().outer_direction *= -1;
+        
     }
     void SetOrbitSpeed()
     {
         float newSpeed = GameObject.Find("Slider").GetComponent<Slider>().value;
         SushiController ctrl = selectedObj.GetComponentInParent<SushiController>();
         if (selectedObj.name == "Inner Sauce Plate")
-        {
-            float direction = ctrl.inner_speed / Mathf.Abs(ctrl.inner_speed);
-            ctrl.inner_speed = direction * newSpeed;
-        }
+            ctrl.inner_speed =  newSpeed;
+
         else
-        {
-            float direction = ctrl.outer_speed / Mathf.Abs(ctrl.outer_speed);
-            ctrl.outer_speed = direction * newSpeed;
-        }
+            ctrl.outer_speed = newSpeed;
     }
 
     void CloseWindow()
@@ -127,6 +119,10 @@ public class GameState : MonoBehaviour
 
         GameObject[] systems = GameObject.FindGameObjectsWithTag("ParticleSystem");
 
+        // Update broken and consumed plate count
+        GameObject.Find("nConsumed").GetComponent<Text>().text = platesConsumed.ToString();
+        GameObject.Find("nBroken").GetComponent<Text>().text = platesBroken.ToString();
+
 
         if (Input.GetMouseButtonDown(0))
         {
@@ -143,6 +139,12 @@ public class GameState : MonoBehaviour
                 {
                     Debug.Log("Selected sauce");
                     saucePanel.SetActive(true);
+                    SushiController sushiController = selectedObj.GetComponentInParent<SushiController>();
+                    if (selectedObj.name == "Inner Sauce Plate")
+                        saucePanel.transform.Find("Slider").GetComponent<Slider>().value = sushiController.inner_speed;
+                    else
+                        saucePanel.transform.Find("Slider").GetComponent<Slider>().value = sushiController.outer_speed;
+
                 }
             }
         }

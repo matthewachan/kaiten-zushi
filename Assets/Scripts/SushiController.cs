@@ -18,6 +18,8 @@ public class SushiController : MonoBehaviour
 
     public float inner_speed;
     public float outer_speed;
+    public int inner_direction;
+    public int outer_direction;
 
     private float spawnTime;
     bool destroyed = false;
@@ -49,6 +51,8 @@ public class SushiController : MonoBehaviour
             float r2 = 0.6f;
             inner_speed = 20;
             outer_speed = 50;
+            inner_direction = 1;
+            outer_direction = 1;
 
             inner_marker = new GameObject();
             inner_marker.transform.SetParent(transform);
@@ -189,10 +193,11 @@ public class SushiController : MonoBehaviour
         // Freeze sauce plates when a special plate is selected
         if (isSpecial && state.selectedObj != this.gameObject)
         {
-            inner_marker.transform.RotateAround(transform.position, transform.up, Time.deltaTime * inner_speed);
+
+            inner_marker.transform.RotateAround(transform.position, transform.up, Time.deltaTime * inner_speed * inner_direction);
             inner_sauce.transform.position = inner_marker.transform.position;
 
-            outer_marker.transform.RotateAround(transform.position, transform.up, Time.deltaTime * outer_speed);
+            outer_marker.transform.RotateAround(transform.position, transform.up, Time.deltaTime * outer_speed * outer_direction);
             outer_sauce.transform.position = outer_marker.transform.position;
         }
 
@@ -239,7 +244,6 @@ public class SushiController : MonoBehaviour
             //radius = sphereSize;
             float diff = Vector3.Distance(pos, sphere.transform.position);
             radius /= 2;
-            Debug.Log(radius);
 
             if (diff < radius)
                 this.transform.position = new Vector3(pos.x, 1.5f, pos.z);
