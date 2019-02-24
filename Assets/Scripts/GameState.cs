@@ -22,11 +22,16 @@ public class GameState : MonoBehaviour
 
     public GameObject beltPanel;
     public GameObject saucePanel;
-    
+    public GameObject camPanel;
+
+    bool restaurantMode;
+
+    Color highlightColor = Color.green;
 
     // Start is called before the first frame update
     void Start()
     {
+        restaurantMode = true;
 
         gameObjects = new ArrayList();
 
@@ -41,16 +46,62 @@ public class GameState : MonoBehaviour
         saucePanel = GameObject.Find("Sauce Panel");
         saucePanel.transform.Find("Slider").GetComponent<Slider>().onValueChanged.AddListener(delegate { SetOrbitSpeed(); });
         saucePanel.transform.Find("Flip Button").GetComponent<Button>().onClick.AddListener(ChangeOrbitDirection);
-        //beltPanel.transform.Find("Plus").GetComponent<Button>().onClick.AddListener(IncreaseSpeed);
-        //beltPanel.transform.Find("Minus").GetComponent<Button>().onClick.AddListener(ReduceSpeed);
         saucePanel.transform.Find("Escape").GetComponent<Button>().onClick.AddListener(CloseWindow);
         saucePanel.SetActive(false);
+
+        GameObject.Find("Camera Button").GetComponent<Button>().onClick.AddListener(OpenCamPanel);
+
+        camPanel = GameObject.Find("Camera Panel");
+        ToggleRestaurantMode();
+        camPanel.transform.Find("Restaurant Mode").GetComponent<Button>().onClick.AddListener(ToggleRestaurantMode);
+        camPanel.transform.Find("Player Mode").GetComponent<Button>().onClick.AddListener(TogglePlayerMode);
+        camPanel.transform.Find("Escape").GetComponent<Button>().onClick.AddListener(CloseWindow);
+        camPanel.SetActive(false);
 
         paused = false;
         difficulty = "easy";
         platesBroken = 0;
         platesConsumed = 0;
 
+    }
+
+    void OpenCamPanel()
+    {
+        camPanel.SetActive(true);
+    }
+
+    void ToggleRestaurantMode()
+    {
+        ColorBlock cb = camPanel.transform.Find("Restaurant Mode").GetComponent<Button>().colors;
+        cb.normalColor = highlightColor;
+        camPanel.transform.Find("Restaurant Mode").GetComponent<Button>().colors = cb;
+
+        cb = camPanel.transform.Find("Player Mode").GetComponent<Button>().colors;
+        cb.normalColor = Color.white;
+        camPanel.transform.Find("Player Mode").GetComponent<Button>().colors = cb;
+
+        camPanel.transform.Find("Pitch").gameObject.SetActive(false);
+        camPanel.transform.Find("Yaw").gameObject.SetActive(false);
+        camPanel.transform.Find("Speed").gameObject.SetActive(false);
+        camPanel.transform.Find("Backward").gameObject.SetActive(false);
+        camPanel.transform.Find("Forward").gameObject.SetActive(false);
+    }
+
+    void TogglePlayerMode()
+    {
+        ColorBlock cb = camPanel.transform.Find("Player Mode").GetComponent<Button>().colors;
+        cb.normalColor = highlightColor;
+        camPanel.transform.Find("Player Mode").GetComponent<Button>().colors = cb;
+
+        cb = camPanel.transform.Find("Restaurant Mode").GetComponent<Button>().colors;
+        cb.normalColor = Color.white;
+        camPanel.transform.Find("Restaurant Mode").GetComponent<Button>().colors = cb;
+
+        camPanel.transform.Find("Pitch").gameObject.SetActive(true);
+        camPanel.transform.Find("Yaw").gameObject.SetActive(true);
+        camPanel.transform.Find("Speed").gameObject.SetActive(true);
+        camPanel.transform.Find("Backward").gameObject.SetActive(true);
+        camPanel.transform.Find("Forward").gameObject.SetActive(true);
     }
 
     void ChangeOrbitDirection()
@@ -88,6 +139,10 @@ public class GameState : MonoBehaviour
         {
             saucePanel.SetActive(false);
         }
+        else
+        {
+            camPanel.SetActive(false);
+        }
     }
 
     void ReduceSpeed()
@@ -116,6 +171,15 @@ public class GameState : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // Disable player mode menu options
+        if (restaurantMode)
+        {
+            //camPanel.transform.Find("Pitch").gameObject.SetActive(false);
+            //camPanel.transform.Find("Yaw").gameObject.SetActive(false);
+            //camPanel.transform.Find("Speed").gameObject.SetActive(false);
+            //camPanel.transform.Find("Backward").gameObject.SetActive(false);
+            //camPanel.transform.Find("Forward").gameObject.SetActive(false);
+        }
 
         GameObject[] systems = GameObject.FindGameObjectsWithTag("ParticleSystem");
 

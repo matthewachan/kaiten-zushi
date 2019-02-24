@@ -22,7 +22,7 @@ public class SushiController : MonoBehaviour
     public int outer_direction;
 
     private float spawnTime;
-    bool destroyed = false;
+    //bool destroyed = false;
 
     private float fadeSpeed = 0.2f;
 
@@ -41,7 +41,7 @@ public class SushiController : MonoBehaviour
     {
 
         state = GameObject.Find("GameState").GetComponent<GameState>();
-        spawnTime = Time.time;
+        //spawnTime = Time.time;
         dragging = false;
         default_color = GetComponentsInChildren<Renderer>()[0].material.color;  
 
@@ -87,13 +87,14 @@ public class SushiController : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.name == "Spawn Point" && !dragging)
+        if (other.name == "Destroy Point" && !dragging)
         {
-            if ((Time.time - spawnTime) > 0.5f && !destroyed)
-            {
-                destroyed = true;
-                Break();
-            }
+            Break();
+            //if ((Time.time - spawnTime) > 0.5f && !destroyed)
+            //{
+            //    destroyed = true;
+            //    Break();
+            //}
         }
 
     }
