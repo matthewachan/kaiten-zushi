@@ -25,7 +25,9 @@ public class GameState : MonoBehaviour
     public GameObject camPanel;
     public GameObject chefPanel;
 
-    //bool restaurantMode;
+    float cameraTranslateSpeed = 0;
+
+    bool restaurantMode;
 
     Color highlightColor = Color.green;
 
@@ -35,7 +37,7 @@ public class GameState : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //restaurantMode = true;
+        restaurantMode = true;
 
         gameObjects = new ArrayList();
 
@@ -74,8 +76,9 @@ public class GameState : MonoBehaviour
         camPanel.transform.Find("Restaurant Mode").GetComponent<Button>().onClick.AddListener(ToggleRestaurantMode);
         camPanel.transform.Find("Player Mode").GetComponent<Button>().onClick.AddListener(TogglePlayerMode);
         camPanel.transform.Find("Escape").GetComponent<Button>().onClick.AddListener(CloseWindow);
-        camPanel.transform.Find("Forward").GetComponent<Button>().onClick.AddListener(MoveCameraForward);
-        camPanel.transform.Find("Backward").GetComponent<Button>().onClick.AddListener(MoveCameraBackward);
+        //camPanel.transform.Find("Forward").GetComponent<Button>().onClick.AddListener(MoveCameraForward);
+        //camPanel.transform.Find("Backward").GetComponent<Button>().onClick.AddListener(MoveCameraBackward);
+        camPanel.transform.Find("Speed").GetComponentInChildren<Slider>().onValueChanged.AddListener(MoveCamera);
 
         camPanel.SetActive(true);
 
@@ -140,16 +143,24 @@ public class GameState : MonoBehaviour
         Camera.main.transform.position = camPos;
         Camera.main.transform.rotation = camRot;
 
+        restaurantMode = true;
 
         camPanel.transform.Find("Pitch").gameObject.SetActive(false);
         camPanel.transform.Find("Yaw").gameObject.SetActive(false);
         camPanel.transform.Find("Speed").gameObject.SetActive(false);
-        camPanel.transform.Find("Backward").gameObject.SetActive(false);
-        camPanel.transform.Find("Forward").gameObject.SetActive(false);
+        //camPanel.transform.Find("Backward").gameObject.SetActive(false);
+        //camPanel.transform.Find("Forward").gameObject.SetActive(false);
+    }
+
+    public void MoveCamera(float value)
+    {
+        cameraTranslateSpeed = camPanel.transform.Find("Speed").GetComponentInChildren<Slider>().value;
+        //Camera.main.transform.Translate(Vector3.forward * value);
     }
 
     public void MoveCameraForward()
     {
+        //cameraTranslateSpeed = camPanel.transform.Find("Speed").GetComponentInChildren<Slider>().value;
         float speed = camPanel.transform.Find("Speed").GetComponentInChildren<Slider>().value;
         Camera.main.transform.Translate(Vector3.forward * speed);
     }
@@ -173,6 +184,8 @@ public class GameState : MonoBehaviour
         Camera.main.transform.position = camPos;
         Camera.main.transform.rotation = camRot;
 
+        restaurantMode = false;
+
         // Update slider values
         camPanel.transform.Find("Yaw").GetComponentInChildren<Slider>().value = Camera.main.transform.rotation.eulerAngles.y;
         camPanel.transform.Find("Pitch").GetComponentInChildren<Slider>().value = Camera.main.transform.rotation.eulerAngles.x;
@@ -180,8 +193,8 @@ public class GameState : MonoBehaviour
         camPanel.transform.Find("Pitch").gameObject.SetActive(true);
         camPanel.transform.Find("Yaw").gameObject.SetActive(true);
         camPanel.transform.Find("Speed").gameObject.SetActive(true);
-        camPanel.transform.Find("Backward").gameObject.SetActive(true);
-        camPanel.transform.Find("Forward").gameObject.SetActive(true);
+        //camPanel.transform.Find("Backward").gameObject.SetActive(true);
+        //camPanel.transform.Find("Forward").gameObject.SetActive(true);
     }
 
     void SetDifficultyHard()
@@ -292,7 +305,7 @@ public class GameState : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-    
+
 
 
         GameObject[] systems = GameObject.FindGameObjectsWithTag("ParticleSystem");
@@ -355,9 +368,17 @@ public class GameState : MonoBehaviour
         ChefController chefController = GameObject.Find("Chef").GetComponent<ChefController>();
         if (beltPanel.activeInHierarchy)
             beltPanel.transform.Find("Slider").GetComponent<Slider>().value = ctrl.prevSpeed;
-
         else if (chefPanel.activeInHierarchy)
             chefPanel.transform.Find("Slider").GetComponent<Slider>().value = chefController.coolDown;
+        else if (camPanel.activeInHierarchy)
+            camPanel.transform.Find("Speed").GetComponentInChildren<Slider>().value = cameraTranslateSpeed;
+
+
+        if (!restaurantMode)
+        {
+            Camera.main.transform.Translate(Vector3.forward * cameraTranslateSpeed * Time.deltaTime);
+        }
+
 
     }
 }
