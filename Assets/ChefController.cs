@@ -8,7 +8,7 @@ public class ChefController : MonoBehaviour
     public GameObject specialPlate;
     public GameObject dessertPlate;
 
-    private int coolDown = 5;
+    public int coolDown = 5;
     private float timeStamp;
 
     private bool setPause = false;
@@ -44,6 +44,8 @@ public class ChefController : MonoBehaviour
     {
         GameState state = GameObject.Find("GameState").GetComponent<GameState>();
       
+
+
         // Freeze cooldown timer if the game is in a paused state
         if (state.paused)
         {

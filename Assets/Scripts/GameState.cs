@@ -23,6 +23,7 @@ public class GameState : MonoBehaviour
     public GameObject beltPanel;
     public GameObject saucePanel;
     public GameObject camPanel;
+    public GameObject chefPanel;
 
     //bool restaurantMode;
 
@@ -40,19 +41,20 @@ public class GameState : MonoBehaviour
 
         canvas = GameObject.Find("Canvas");
 
+        // Conveyor belt UI panel
         beltPanel = GameObject.Find("Belt Panel");
         beltPanel.transform.Find("Slider").GetComponent<Slider>().onValueChanged.AddListener(SetBeltSpeed);
-        //beltPanel.transform.Find("Plus").GetComponent<Button>().onClick.AddListener(IncreaseSpeed);
-        //beltPanel.transform.Find("Minus").GetComponent<Button>().onClick.AddListener(ReduceSpeed);
         beltPanel.transform.Find("Escape").GetComponent<Button>().onClick.AddListener(CloseWindow);
         beltPanel.SetActive(false);
     
+        // Sauce plate UI panel
         saucePanel = GameObject.Find("Sauce Panel");
         saucePanel.transform.Find("Slider").GetComponent<Slider>().onValueChanged.AddListener(delegate { SetOrbitSpeed(); });
         saucePanel.transform.Find("Flip Button").GetComponent<Button>().onClick.AddListener(ChangeOrbitDirection);
         saucePanel.transform.Find("Escape").GetComponent<Button>().onClick.AddListener(CloseWindow);
         saucePanel.SetActive(false);
 
+        // Settings UI panel
         camPos = Camera.main.transform.position;
         camRot = Camera.main.transform.rotation;
 
@@ -77,6 +79,14 @@ public class GameState : MonoBehaviour
 
         camPanel.SetActive(true);
 
+
+        // Chef UI panel
+        chefPanel = GameObject.Find("Chef Panel");
+        chefPanel.transform.Find("Escape").GetComponent<Button>().onClick.AddListener(CloseWindow);
+        chefPanel.transform.Find("Slider").GetComponent<Slider>().onValueChanged.AddListener(SetSpawnCooldown);
+        chefPanel.SetActive(false);
+
+
         paused = false;
         difficulty = "easy";
         platesBroken = 0;
@@ -84,12 +94,16 @@ public class GameState : MonoBehaviour
 
     }
 
+    void SetSpawnCooldown(float value)
+    {
+        GameObject.Find("Chef").GetComponent<ChefController>().coolDown = (int) value;
+    }
+
     void SetBeltSpeed(float value)
     {
         KaitenController ctrl = GameObject.Find("Kaiten Zushi").GetComponent<KaitenController>();
         ctrl.prevSpeed = (int) value;
-        //if (ctrl.prevSpeed > 0)
-            //ctrl.prevSpeed--;
+
     }
 
     void SetCameraRotation(float value)
@@ -109,6 +123,8 @@ public class GameState : MonoBehaviour
         camPanel.SetActive(true);
         DeactivateBeltPanel();
         saucePanel.SetActive(false);
+        chefPanel.SetActive(false);
+
     }
 
     void ToggleRestaurantMode()
@@ -240,9 +256,13 @@ public class GameState : MonoBehaviour
         {
             saucePanel.SetActive(false);
         }
-        else
+        else if (camPanel.activeInHierarchy)
         {
             camPanel.SetActive(false);
+        }
+        else
+        {
+            chefPanel.SetActive(false);
         }
     }
 
@@ -272,6 +292,8 @@ public class GameState : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+    
+
 
         GameObject[] systems = GameObject.FindGameObjectsWithTag("ParticleSystem");
 
@@ -290,13 +312,26 @@ public class GameState : MonoBehaviour
             RaycastHit info;
             if (Physics.Raycast(inputRay, out info))
             {
-                selectedObj = info.collider.gameObject;
+
+                if (info.collider.gameObject.tag != "NonSelectable")
+                    selectedObj = info.collider.gameObject;
+
+                Debug.Log(selectedObj.name);
+
+                if (selectedObj.tag == "Chef")
+                {
+                    chefPanel.SetActive(true);
+                    saucePanel.SetActive(false);
+                    DeactivateBeltPanel();
+                    camPanel.SetActive(false);
+                }
+
+
                 if (selectedObj.tag == "Sauce")
                 {
-                    //Debug.Log("Selected sauce");
                     saucePanel.SetActive(true);
                     DeactivateBeltPanel();
-                    //beltPanel.SetActive(false);
+                    chefPanel.SetActive(false);
                     camPanel.SetActive(false);
 
                     SushiController sushiController = selectedObj.GetComponentInParent<SushiController>();
@@ -317,9 +352,12 @@ public class GameState : MonoBehaviour
         }
 
         KaitenController ctrl = GameObject.Find("Kaiten Zushi").GetComponent<KaitenController>();
+        ChefController chefController = GameObject.Find("Chef").GetComponent<ChefController>();
         if (beltPanel.activeInHierarchy)
             beltPanel.transform.Find("Slider").GetComponent<Slider>().value = ctrl.prevSpeed;
-            //GameObject.Find("Value").GetComponent<Text>().text = GameObject.Find("Kaiten Zushi").GetComponent<KaitenController>().prevSpeed.ToString();
+
+        else if (chefPanel.activeInHierarchy)
+            chefPanel.transform.Find("Slider").GetComponent<Slider>().value = chefController.coolDown;
 
     }
 }

@@ -36,6 +36,7 @@ public class BeltControl : MonoBehaviour
                     game_state.beltPanel.SetActive(true);
                     game_state.camPanel.SetActive(false);
                     game_state.saucePanel.SetActive(false);
+                    game_state.chefPanel.SetActive(false);
                     game_state.paused = true;
                     mat.color = Color.green;
 

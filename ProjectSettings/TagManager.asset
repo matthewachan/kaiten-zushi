@@ -8,6 +8,8 @@ TagManager:
   - ParticleSystem
   - Sauce
   - Tray
+  - NonSelectable
+  - Chef
   layers:
   - Default
   - TransparentFX

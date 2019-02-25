@@ -27,6 +27,7 @@ public class SushiController : MonoBehaviour
     public int outer_direction;
 
     private float spawnTime;
+    private float lifetime = 20f;
     //bool destroyed = false;
 
     private float fadeSpeed = 0.2f;
@@ -46,7 +47,7 @@ public class SushiController : MonoBehaviour
     {
 
         state = GameObject.Find("GameState").GetComponent<GameState>();
-        //spawnTime = Time.time;
+        spawnTime = Time.time;
         dragging = false;
         default_color = GetComponentsInChildren<Renderer>()[0].material.color;  
 
@@ -198,6 +199,11 @@ public class SushiController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
+        // Stale plate
+        if (Time.time > spawnTime + lifetime)
+            Break();
+
         if (isDessert)
         {
             float tiltSpeed = 2f;
