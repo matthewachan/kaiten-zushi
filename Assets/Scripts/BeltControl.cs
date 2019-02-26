@@ -15,16 +15,24 @@ public class BeltControl : MonoBehaviour
         ctrl = GameObject.Find("Kaiten Zushi").GetComponent<KaitenController>();
         game_state = GameObject.Find("GameState").GetComponent<GameState>();
         mat = ctrl.belt_mat;
+        ctrl.belt_mat.color = Color.gray;
     }
 
- 
+
     // Update is called once per frame
     void Update()
     {
-        if (game_state.selectedObj != this.gameObject && Input.GetMouseButtonDown(0))
+        if (game_state.selectedObj && game_state.selectedObj.name != "Belt")
+        {
+            game_state.DeactivateBeltPanel();
+        }
+
+    
+
+        if (Input.GetMouseButtonDown(0))
         {
             /* Return if the mouse is over a UI object */
-            if (UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
+            if (UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject() || game_state.IsPointerOverUIObject())
                 return;
             
             Ray inputRay = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -35,7 +43,8 @@ public class BeltControl : MonoBehaviour
                 {
                     game_state.beltPanel.SetActive(true);
                     game_state.camPanel.SetActive(false);
-                    game_state.saucePanel.SetActive(false);
+                    if (game_state.selectedObj != null)
+                        game_state.DeactivateSaucePanel();
                     game_state.chefPanel.SetActive(false);
                     game_state.paused = true;
                     mat.color = Color.green;
@@ -45,7 +54,9 @@ public class BeltControl : MonoBehaviour
 
                 }
             }
+
         }
+
 
     }
 

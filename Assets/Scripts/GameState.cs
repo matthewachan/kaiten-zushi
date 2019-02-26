@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 public class GameState : MonoBehaviour
 {
@@ -87,10 +88,10 @@ public class GameState : MonoBehaviour
         chefPanel = GameObject.Find("Chef Panel");
         chefPanel.transform.Find("Escape").GetComponent<Button>().onClick.AddListener(CloseWindow);
         chefPanel.transform.Find("Slider").GetComponent<Slider>().onValueChanged.AddListener(SetSpawnCooldown);
-        chefPanel.SetActive(false);
+        DeactivateChefPanel();
 
 
-        paused = false;
+        paused = true;
         difficulty = "easy";
         platesBroken = 0;
         platesConsumed = 0;
@@ -123,10 +124,12 @@ public class GameState : MonoBehaviour
 
     void OpenCamPanel()
     {
+        paused = true;
         camPanel.SetActive(true);
         DeactivateBeltPanel();
+        //beltPanel.SetActive(false);
         saucePanel.SetActive(false);
-        chefPanel.SetActive(false);
+        DeactivateChefPanel();
 
     }
 
@@ -247,36 +250,57 @@ public class GameState : MonoBehaviour
             ctrl.outer_speed = newSpeed;
     }
 
-    void DeactivateBeltPanel()
+    void DeactivateChefPanel()
+    {
+        chefPanel.SetActive(false);
+
+        GameObject.Find("Chef").GetComponent<ChefController>().ResetColor();
+    }
+
+    public void DeactivateBeltPanel()
     {
         KaitenController ctrl = GameObject.Find("Kaiten Zushi").GetComponent<KaitenController>();
         beltPanel.SetActive(false);
         ctrl.belt_mat.color = Color.gray;
         ctrl.beltSpeed = ctrl.prevSpeed;
-        GameObject.Find("GameState").GetComponent<GameState>().paused = false;
+        paused = false;
         WakeUpPlates();
     }
 
     void CloseWindow()
     {
         KaitenController ctrl = GameObject.Find("Kaiten Zushi").GetComponent<KaitenController>();
-
         if (beltPanel.activeInHierarchy)
         {
             DeactivateBeltPanel();
         }
         else if (saucePanel.activeInHierarchy)
         {
-            saucePanel.SetActive(false);
+            //saucePanel.SetActive(false);
+            DeactivateSaucePanel();
         }
         else if (camPanel.activeInHierarchy)
         {
             camPanel.SetActive(false);
+            paused = false;
         }
         else
         {
-            chefPanel.SetActive(false);
+            DeactivateChefPanel();
         }
+    }
+
+    public void DeactivateSaucePanel()
+    {
+        saucePanel.SetActive(false);
+        if (selectedObj.tag == "Plate")
+        {
+            SushiController sushiController = selectedObj.GetComponentInParent<SushiController>();
+            sushiController.DeselectSaucePlate(true);
+            sushiController.DeselectSaucePlate(false);
+        }
+
+
     }
 
     void ReduceSpeed()
@@ -302,6 +326,15 @@ public class GameState : MonoBehaviour
 
     }
 
+    public bool IsPointerOverUIObject()
+    {
+        PointerEventData eventDataCurrentPosition = new PointerEventData(EventSystem.current);
+        eventDataCurrentPosition.position = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+        List<RaycastResult> results = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
+        return results.Count > 0;
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -318,8 +351,19 @@ public class GameState : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             /* Return if the mouse is over a UI object */
-            if (UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
+            if (IsPointerOverUIObject() || EventSystem.current.IsPointerOverGameObject())
                 return;
+            //if (EventSystem.current.IsPointerOverGameObject())
+                //return;
+            //       if (EventSystem.current.IsPointerOverGameObject() ||
+            //EventSystem.current.currentSelectedGameObject != null)
+            //{
+            //    return;
+
+            //}
+            //UnityEngine.EventSystems.EventSystem evtSys = UnityEngine.EventSystems.EventSystem.current;
+            //if (evtSys.IsPointerOverGameObject() || evtSys.currentSelectedGameObject != null)
+            //return;
 
             Ray inputRay = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit info;
@@ -334,7 +378,7 @@ public class GameState : MonoBehaviour
                 if (selectedObj.tag == "Chef")
                 {
                     chefPanel.SetActive(true);
-                    saucePanel.SetActive(false);
+                    DeactivateSaucePanel();
                     DeactivateBeltPanel();
                     camPanel.SetActive(false);
                 }
@@ -344,14 +388,20 @@ public class GameState : MonoBehaviour
                 {
                     saucePanel.SetActive(true);
                     DeactivateBeltPanel();
-                    chefPanel.SetActive(false);
+                    DeactivateChefPanel();
                     camPanel.SetActive(false);
 
                     SushiController sushiController = selectedObj.GetComponentInParent<SushiController>();
                     if (selectedObj.name == "Inner Sauce Plate")
+                    {
+                        sushiController.DeselectSaucePlate(false);
                         saucePanel.transform.Find("Slider").GetComponent<Slider>().value = sushiController.inner_speed;
+                    }
                     else
+                    {
+                        sushiController.DeselectSaucePlate(true);
                         saucePanel.transform.Find("Slider").GetComponent<Slider>().value = sushiController.outer_speed;
+                    }
 
                 }
             }

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class SushiController : MonoBehaviour
 {
@@ -27,7 +28,7 @@ public class SushiController : MonoBehaviour
     public int outer_direction;
 
     private float spawnTime;
-    private float lifetime = 20f;
+    private float lifetime = 30f;
     //bool destroyed = false;
 
     private float fadeSpeed = 0.2f;
@@ -35,7 +36,7 @@ public class SushiController : MonoBehaviour
 
     public GameObject spherePrefab;
     GameObject sphere;
-    private float sphereSize = 5f;
+    private float sphereSize = 8f;
 
     GameState state;
 
@@ -131,12 +132,44 @@ public class SushiController : MonoBehaviour
 
     }
 
+    public void SelectSaucePlate(bool isInner)
+    {
+        if (isInner)
+        {
+            Renderer rend = inner_sauce.GetComponent<Renderer>();
+            rend.material.color = new Color(0, 1, 0, rend.material.color.a);
+        }
+        else
+        {
+            Renderer rend = outer_sauce.GetComponent<Renderer>();
+            rend.material.color = new Color(0, 1, 0, rend.material.color.a);
+        }
+    }
+
+    public void DeselectSaucePlate(bool isInner)
+    {
+        if (!isSpecial)
+            return;
+
+        if (isInner)
+        {
+            Renderer rend = inner_sauce.GetComponent<Renderer>();
+            rend.material.color = new Color(0, 0, 1, rend.material.color.a);
+        }
+        else
+        {
+            Renderer rend = outer_sauce.GetComponent<Renderer>();
+            rend.material.color = new Color(1, 0, 0, rend.material.color.a);
+        }
+    }
+
     private void OnCollisionStay(Collision collision)
     {
         GameObject other = collision.gameObject;
    
         if (other.name == "Table")
         {
+            lifetime = Mathf.Infinity;
             if (MakeTransparent() < 0.1f)
             {
                 Consume();
@@ -175,6 +208,10 @@ public class SushiController : MonoBehaviour
         {
             state.gameObjects.Remove(this.gameObject);
             state.platesConsumed++;
+
+            if (sphere)
+                Destroy(sphere);
+
             Destroy(this.gameObject);
         }
     }
@@ -188,6 +225,9 @@ public class SushiController : MonoBehaviour
 
             GameObject smoke = Instantiate(breakPrefab);
             smoke.transform.position = this.transform.position;
+
+            if (sphere)
+                Destroy(sphere);
 
             GetComponent<AudioSource>().Play();
             Destroy(this.gameObject, GetComponent<AudioSource>().clip.length);
@@ -203,6 +243,31 @@ public class SushiController : MonoBehaviour
         // Stale plate
         if (Time.time > spawnTime + lifetime)
             Break();
+
+        if (isSpecial)
+        {
+            if (state.selectedObj == inner_sauce)
+            {
+                SelectSaucePlate(true);
+                DeselectSaucePlate(false);
+            }
+            else
+            {
+                DeselectSaucePlate(true);
+            }
+
+            if (state.selectedObj == outer_sauce)
+            {
+                SelectSaucePlate(false);
+                DeselectSaucePlate(true);
+            }
+            else
+            {
+                DeselectSaucePlate(false);
+            }
+
+        }
+
 
         if (isDessert)
         {
@@ -237,6 +302,9 @@ public class SushiController : MonoBehaviour
         // Instant where user begins dragging
         if (Input.GetMouseButtonDown(0) && !dragging)
         {
+            if (EventSystem.current.IsPointerOverGameObject() || state.IsPointerOverUIObject())
+                return;
+
             Ray inputRay = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit info;
             if (Physics.Raycast(inputRay, out info))
@@ -274,7 +342,6 @@ public class SushiController : MonoBehaviour
             Vector3 pos = camRay.GetPoint(dist);
 
             float radius = sphere.GetComponent<Renderer>().bounds.extents.magnitude;
-            //radius = sphereSize;
             float diff = Vector3.Distance(pos, sphere.transform.position);
             radius /= 2;
 
